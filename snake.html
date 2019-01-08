@@ -37,6 +37,7 @@
 		var sVelX = 0;
 		var sVelY = 0;
 		var snakeTail = [];
+
 		var snakeMaxTail = 100;
 
 		var appleAmount = 3;
@@ -46,9 +47,10 @@
 		var applesGone = true;
 		var curAX = [];
 		var curAY = [];
+		var count = 0;
 		
           for(var  i = 0; i< appleAmount; i++){
-            	apples[i] = {x:0, y:0};
+            	apples[i] = {x:0, y:0, live: true};
             }
 
 
@@ -58,9 +60,16 @@
             
           
 
-           for(var i=0; i< appleAmount ;i++){     
+           for(var i=0; i< appleAmount ;i++){ 
+
+           /*if(apples[i].live == false){
+               count++;
+               if(count>=3) {applesGone = true;count = 0;}
+            } */    
+            
+
             if(applesGone){
-            	
+            apples[i].live = true;
          	apples[i].x= Math.floor(Math.random() * (800 - 0 + 1)) + 0;
          	apples[i].y= Math.floor(Math.random() * (500 - 0 + 1)) + 0;   
             curAX[i] = apples[i].x;            
@@ -72,11 +81,20 @@
          	if(!applesGone){
          	apples[i].x=curAX[i];
          	apples[i].y=curAY[i];
-         	}     	
+         	}  
+
+         	if(apples[i].live){
             ctx.rect(apples[i].x, apples[i].y, appleWidth, appleHeight);
             ctx.fill();
         }
-        applesGone = false;
+        }
+        for(var i=0; i<appleAmount;i++){
+        	if(apples[i].live) count++;
+        }
+        if(count>=1){
+        applesGone = false; count =0;
+    }
+        else {applesGone = true; console.log("яблоки кончились") }
     }
      
         
@@ -85,8 +103,9 @@
         function collisionTail(){
         	for(var i=0;i< appleAmount; i++){
         		var a = apples[i];
-        		if(snakeX > a.x && snakeX < a.x+appleWidth && snakeY > a.y && snakeY < a.y+appleHeight) 
-        			console.log("eaten"+ [i]);
+        		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
+        			apples[i].live = false;
+        		}
         	}
 
         }
@@ -94,18 +113,21 @@
 		function drawSnake(){
 			
 			ctx.beginPath();
-			//ctx.rect(snakeX, snakeY, snakeWidth, snakeHeight);
+			
 			ctx.fillStyle = "black";
-
+            
             for(var i=0; i<snakeTail.length;i++){
-      //      	console.log(snakeTail[i].x + "+" + snakeTail[i].y )
+     
 	        ctx.fillRect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
+	      
 
 	    }
              
 
             snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
+        
 			ctx.fill();
+
             
 			if( snakeTail.length > snakeMaxTail )
            {           	
@@ -114,18 +136,21 @@
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
-             
+             }
 
-		}
+		
 
         function draw()
         {
-          
           ctx.clearRect(0,0, canvas.width, canvas.height);
-          collisionTail();
-          drawSnake();
           
           appleSpawner();
+          drawSnake();
+          collisionTail();
+
+          
+          
+          
           
           
 
