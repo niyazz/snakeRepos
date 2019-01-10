@@ -38,7 +38,7 @@
 		var sVelY = 0;
 		var snakeTail = [];
 
-		var snakeMaxTail = 100;
+		var snakeMaxTail = 10;
 
 		var appleAmount = 3;
 		var apples = [];
@@ -105,6 +105,7 @@
         		var a = apples[i];
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
         			apples[i].live = false;
+        			snakeMaxTail+=1;
         		}
         	}
 
