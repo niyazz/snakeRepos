@@ -18,9 +18,6 @@
 		document.addEventListener("keydown", keyDownHandler, false);
      	document.addEventListener("keyup", keyUpHandler, false);
 
-     //for second commit
-
-
 		var canvas = document.getElementById("myCanvas");
 		var ctx = canvas.getContext("2d");
 
@@ -38,7 +35,9 @@
 		var sVelY = 0;
 		var snakeTail = [];
 
-		var snakeMaxTail = 10;
+		var snakeMaxTail = 5;
+		var safeZone =  2;
+		var gameStarted = false;
 
 		var appleAmount = 3;
 		var apples = [];
@@ -49,8 +48,10 @@
 		var curAY = [];
 		var count = 0;
 
-		var  tailSafeZone = 2;
-
+		var canUp = true ;
+		var canDown = true;
+		var canRight =  true;
+		var  canLeft = true;
 
           for(var  i = 0; i< appleAmount; i++){
             	apples[i] = {x:0, y:0, live: true};
@@ -59,54 +60,47 @@
 
 
         function appleSpawner(){
-          ctx.fillStyle = "lime"     
-            
-          
 
+            
+             ctx.fillStyle = "lime";
            for(var i=0; i< appleAmount ;i++){ 
 
-
-
-
-
             if(applesGone){
-            apples[i].live = true;
-         	apples[i].x= Math.floor(Math.random() * (800 - 0 + 1)) + 0;
-         	apples[i].y= Math.floor(Math.random() * (500 - 0 + 1)) + 0;   
-            curAX[i] = apples[i].x;            
-            curAY[i] = apples[i].y;
-            console.log("Apple " + i +" x = " +curAX[i] + "y = "+ curAY[i]);
-
+              apples[i].live = true;            
+         	  apples[i].x= Math.floor(Math.random() * (800 - 0 + 1)) + 0;
+         	  apples[i].y= Math.floor(Math.random() * (500 - 0 + 1)) + 0;   
+              curAX[i] = apples[i].x;            
+              curAY[i] = apples[i].y;
          	}
 
          	if(!applesGone){
-         	apples[i].x=curAX[i];
-         	apples[i].y=curAY[i];
+         	  apples[i].x=curAX[i];
+         	  apples[i].y=curAY[i];
          	}  
 
          	if(apples[i].live){
-            ctx.rect(apples[i].x, apples[i].y, appleWidth, appleHeight);
-            ctx.fill();
-        }
+              ctx.rect(apples[i].x, apples[i].y, appleWidth, appleHeight);
+              ctx.fill();
+            }
         }
         for(var i=0; i<appleAmount;i++){
         	if(apples[i].live) count++;
         }
         if(count>=1){
-        applesGone = false; count =0;
+          applesGone = false; count =0;
     }
-        else {applesGone = true; console.log("яблоки кончились") }
+        else {
+        	applesGone = true;
+        }
     }
      
-        
-    
-
         function collisionApple(){
         	for(var i=0;i< appleAmount; i++){
         		var a = apples[i];
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
         			apples[i].live = false;
         			snakeMaxTail+=1;
+
         			
         		}
         	}
@@ -117,130 +111,101 @@
 			
 			ctx.beginPath();
 			
+            if(gameStarted){
 
-			snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
-			//ctx.fillStyle = "black";
-            
-            for(var i=0; i<snakeTail.length;i++){
-          
-            if(i == snakeTail.length-1) snakeTail[i].color = ctx.fillStyle = "red";
-            else snakeTail[i].color = ctx.fillStyle = "blue";
-	        ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
-	      
+			snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle});
+            for(var i=0; i<snakeTail.length;i++){         
+               snakeTail[i].color = ctx.fillStyle = "yellow";           
+	           ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
 }
-             //ctx.fillStyle = "red";	
-               //snakeTail[snakeTail.length-1].color = ctx.fillStyle;
+			   ctx.fill();     
 
-            
-
-
-             
-
-        
-			ctx.fill();
-
-
-                             	            
-			if( snakeTail.length > snakeMaxTail )
-           {          
-           	   
+			while( snakeTail.length > snakeMaxTail )
+           {                  	   
                snakeTail.shift();
-               
            }
 
-          /* if( snakeTail.length > snakeMaxTail ){
-           	console.log('here');
-           for(var j=snakeTail.length-1;j>=0;j--){
-           	if(snakeX < snakeTail[j].x + snakeWidth
-           		&& snakeX + snakeWidth > snakeTail[j].x 
-           		&& snakeY < snakeTail[j].y + snakeHeight
-           		&& snakeY + snakeHeight > snakeTail[j].y){
-           		console.log("jjj");
-           	}
-           }
-       }*/
-
-
+            var snakeHead = snakeTail[snakeTail.length-1];
+          	for(var k = snakeTail.length-2; k>=0; k--){
+          			if(snakeHead.x==snakeTail[k].x && snakeHead.y == snakeTail[k].y){
+          				snakeMaxTail = snakeMaxTail - k;        				
+          		        for(var c = 0; c<=k; c++){
+          			         snakeTail[c].color = ctx.fillStyle = "red";
+          			         ctx.fill();         
+          		}	
+          	}
+          }
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
              }
-
-		
-
-        
-
+     
+}
 
 
 
         function draw()
         {
           ctx.clearRect(0,0, canvas.width, canvas.height);
-          
           appleSpawner();
           drawSnake();
           collisionApple();
 
-          
-          
-          
-          
-          
 
-            if(upPressed &&!downPressed && !leftPressed && !rightPressed){
-            	  sVelY=-snakeSpeed;   
-            	  sVelX=0;           
+            if(upPressed &&!downPressed && !leftPressed && !rightPressed  ){    
+            if(canUp)      {
+            	  sVelY=-snakeSpeed;               	 
+            	  sVelX=0;       }    
             }
-            if(downPressed && !upPressed && !leftPressed && !rightPressed ){
+            if(downPressed && !upPressed && !leftPressed && !rightPressed  ){
+            	if(canDown){
             	    sVelY=+snakeSpeed;   
-            	    sVelX=0;     	
+            	    sVelX=0;     	}
             }
-            if(leftPressed && !rightPressed && !upPressed && !downPressed){
+            if(leftPressed && !rightPressed && !upPressed && !downPressed ){
+            	if(canLeft){
             	sVelX=-snakeSpeed;
             	sVelY=0;
             }
-            if(rightPressed && !leftPressed && !upPressed && !downPressed){
+            }
+            if(rightPressed && !leftPressed && !upPressed && !downPressed  ){
+            	if(canRight){
             	sVelX=+snakeSpeed;
             	sVelY=0;
             }
-            if(snakeX > canvas.width) {snakeX = 2;console.log("уперлась вправо");}
+            }
+            if(snakeX > canvas.width) {snakeX = 2;}
 
-            if(snakeX < 0) {snakeX = canvas.width;console.log("уперлась влево");}
+            if(snakeX < 0) {snakeX = canvas.width;}
 
-            if(snakeY > canvas.height) {snakeY = 2;console.log("уперлась вниз");}
+            if(snakeY > canvas.height) {snakeY = 2;}
 
-            if(snakeY < 0) {snakeY = canvas.height;console.log("уперлась вверх");}
+            if(snakeY < 0) {snakeY = canvas.height;}
 
 
         }
         
-
         function keyDownHandler(e){
             switch(e.key)
             {          	
-            	case "ArrowRight": rightPressed = true; break;
-            	case "ArrowLeft": leftPressed = true; break;
-            	case "ArrowUp": upPressed = true; break;
-            	case "ArrowDown": downPressed = true; break;      
+            	case "ArrowRight": rightPressed = true; canUp = true; canDown = true; canLeft = false; gameStarted= true; break;
+            	case "ArrowLeft": leftPressed = true;canUp = true; canDown = true; canRight= false; gameStarted= true;  break;
+            	case "ArrowUp": upPressed = true;canLeft = true; canDown = false; canRight= true;gameStarted= true;  break;
+            	case "ArrowDown": downPressed = true;canLeft = true;canUp = false;  canRight= true;gameStarted= true;  break;      
             }
         }
-
-
-
 
          function keyUpHandler(e){
             switch(e.key)
             {          	
-            	case "ArrowRight": rightPressed = false; break;
-            	case "ArrowLeft": leftPressed = false; break;
+            	case "ArrowRight": rightPressed = false;  break;
+            	case "ArrowLeft": leftPressed = false;  break;
             	case "ArrowUp": upPressed = false; break;
             	case "ArrowDown": downPressed = false; break;      
             }
         }
            
-            setInterval(draw, 10);
-     		
-     		
+            setInterval(draw, 10); 		
 	</script>;;
 
 
