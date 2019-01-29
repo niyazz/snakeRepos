@@ -48,7 +48,10 @@
 		var curAX = [];
 		var curAY = [];
 		var count = 0;
-		
+
+		var  tailSafeZone = 2;
+
+
           for(var  i = 0; i< appleAmount; i++){
             	apples[i] = {x:0, y:0, live: true};
             }
@@ -61,12 +64,6 @@
           
 
            for(var i=0; i< appleAmount ;i++){ 
-
-           /*if(apples[i].live == false){
-               count++;
-               if(count>=3) {applesGone = true;count = 0;}
-            } */    
-            
 
             if(applesGone){
             apples[i].live = true;
@@ -98,7 +95,7 @@
     }
      
         
-        
+    
 
         function collisionTail(){
         	for(var i=0;i< appleAmount; i++){
@@ -106,6 +103,7 @@
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
         			apples[i].live = false;
         			snakeMaxTail+=1;
+        			
         		}
         	}
 
@@ -115,25 +113,37 @@
 			
 			ctx.beginPath();
 			
-			ctx.fillStyle = "black";
-            
-            for(var i=0; i<snakeTail.length;i++){
-     
+			ctx.fillStyle = "blue";
+			
+          snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
+
+            for(var i=0; i<snakeTail.length;i++)    {
 	        ctx.fillRect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
-	      
-
 	    }
-             
 
-            snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
+             
         
-			ctx.fill();
+			//ctx.fill();
 
             
 			if( snakeTail.length > snakeMaxTail )
            {           	
                snakeTail.shift();
            }
+
+          /* if( snakeTail.length > snakeMaxTail ){
+           	console.log('here');
+           for(var j=snakeTail.length-1;j>=0;j--){
+           	if(snakeX < snakeTail[j].x + snakeWidth
+           		&& snakeX + snakeWidth > snakeTail[j].x 
+           		&& snakeY < snakeTail[j].y + snakeHeight
+           		&& snakeY + snakeHeight > snakeTail[j].y){
+           		console.log("jjj");
+           	}
+           }
+       }*/
+
+
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
