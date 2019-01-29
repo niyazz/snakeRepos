@@ -48,7 +48,10 @@
 		var curAX = [];
 		var curAY = [];
 		var count = 0;
-		
+
+		var  tailSafeZone = 2;
+
+
           for(var  i = 0; i< appleAmount; i++){
             	apples[i] = {x:0, y:0, live: true};
             }
@@ -62,7 +65,10 @@
 
            for(var i=0; i< appleAmount ;i++){ 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c29f17201b2f8cfca70047d81295be90d47a7e12
             if(applesGone){
             apples[i].live = true;
          	apples[i].x= Math.floor(Math.random() * (800 - 0 + 1)) + 0;
@@ -93,7 +99,7 @@
     }
      
         
-        
+    
 
         function collisionApple(){
         	for(var i=0;i< appleAmount; i++){
@@ -101,6 +107,7 @@
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
         			apples[i].live = false;
         			snakeMaxTail+=1;
+        			
         		}
         	}
 
@@ -110,6 +117,7 @@
 			
 			ctx.beginPath();
 			
+
 			snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
 			//ctx.fillStyle = "black";
             
@@ -119,12 +127,15 @@
             else snakeTail[i].color = ctx.fillStyle = "blue";
 	        ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
 	      
-
-	    }
+}
              //ctx.fillStyle = "red";	
                //snakeTail[snakeTail.length-1].color = ctx.fillStyle;
 
             
+
+
+             
+
         
 			ctx.fill();
 
@@ -136,6 +147,20 @@
                snakeTail.shift();
                
            }
+
+          /* if( snakeTail.length > snakeMaxTail ){
+           	console.log('here');
+           for(var j=snakeTail.length-1;j>=0;j--){
+           	if(snakeX < snakeTail[j].x + snakeWidth
+           		&& snakeX + snakeWidth > snakeTail[j].x 
+           		&& snakeY < snakeTail[j].y + snakeHeight
+           		&& snakeY + snakeHeight > snakeTail[j].y){
+           		console.log("jjj");
+           	}
+           }
+       }*/
+
+
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
