@@ -62,11 +62,6 @@
 
            for(var i=0; i< appleAmount ;i++){ 
 
-           /*if(apples[i].live == false){
-               count++;
-               if(count>=3) {applesGone = true;count = 0;}
-            } */    
-            
 
             if(applesGone){
             apples[i].live = true;
@@ -100,7 +95,7 @@
         
         
 
-        function collisionTail(){
+        function collisionApple(){
         	for(var i=0;i< appleAmount; i++){
         		var a = apples[i];
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
@@ -114,24 +109,31 @@
 			
 			ctx.beginPath();
 			
-			ctx.fillStyle = "black";
+			snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
+			//ctx.fillStyle = "black";
             
             for(var i=0; i<snakeTail.length;i++){
-     
-	        ctx.fillRect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
+          
+            if(i == snakeTail.length-1) snakeTail[i].color = ctx.fillStyle = "red";
+            else snakeTail[i].color = ctx.fillStyle = "blue";
+	        ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
 	      
 
 	    }
-             
+             //ctx.fillStyle = "red";	
+               //snakeTail[snakeTail.length-1].color = ctx.fillStyle;
 
-            snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle });
+            
         
 			ctx.fill();
 
-            
+
+                             	            
 			if( snakeTail.length > snakeMaxTail )
-           {           	
+           {          
+           	   
                snakeTail.shift();
+               
            }
 			ctx.closePath();	
 			snakeX+=sVelX;
@@ -140,13 +142,18 @@
 
 		
 
+        
+
+
+
+
         function draw()
         {
           ctx.clearRect(0,0, canvas.width, canvas.height);
           
           appleSpawner();
           drawSnake();
-          collisionTail();
+          collisionApple();
 
           
           
