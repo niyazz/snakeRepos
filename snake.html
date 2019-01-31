@@ -5,7 +5,7 @@
 	<title>The Snake Game</title>
 	<style>
 		canvas{
-		background-color:#d9b3ff;
+		background:#d9b3ff  url('bgr.png');
 	}
 	</style>
 </head>
@@ -35,7 +35,7 @@
 		var sVelY = 0;
 		var snakeTail = [];
 
-		var snakeMaxTail = 5;
+		var snakeMaxTail = 100;
 		var safeZone =  2;
 		var gameStarted = false;
 
@@ -44,6 +44,8 @@
 		var appleWidth = 20;
 		var appleHeight = 20;
 		var applesGone = true;
+		
+		var apCordsNorm = false;
 		var curAX = [];
 		var curAY = [];
 		var count = 0;
@@ -53,6 +55,8 @@
 		var canRight =  true;
 		var  canLeft = true;
 
+		var playerScore = 0;
+
           for(var  i = 0; i< appleAmount; i++){
             	apples[i] = {x:0, y:0, live: true};
             }
@@ -60,15 +64,23 @@
 
 
         function appleSpawner(){
-
-            
              ctx.fillStyle = "lime";
            for(var i=0; i< appleAmount ;i++){ 
 
             if(applesGone){
-              apples[i].live = true;            
-         	  apples[i].x= Math.floor(Math.random() * (800 - 0 + 1)) + 0;
-         	  apples[i].y= Math.floor(Math.random() * (500 - 0 + 1)) + 0;   
+              apples[i].live = true;
+               
+              while(!apCordsNorm){
+               apples[i].x=Math.floor(Math.random() * (800 - 0 + 1)) + 0;
+               apples[i].y =Math.floor(Math.random() * (500 - 0 + 1)) + 0; 
+               if(apples[i].x > 0 + appleWidth*1.5 && apples[i].x<canvas.width - appleWidth*1.5 
+              	&& apples[i].y > 0 + appleHeight*1.5 && apples[i].y<canvas.height - appleHeight*1.5)
+                {                 
+         	             apCordsNorm = true;
+         	     }
+                                  }
+                apCordsNorm = false;
+         	  
               curAX[i] = apples[i].x;            
               curAY[i] = apples[i].y;
          	}
@@ -98,10 +110,12 @@
         	for(var i=0;i< appleAmount; i++){
         		var a = apples[i];
         		if((snakeX + snakeWidth > a.x) && snakeX < a.x+appleWidth && (snakeY + snakeHeight) > a.y && snakeY < a.y+appleHeight) {
-        			apples[i].live = false;
-        			snakeMaxTail+=1;
-
-        			
+        			if(apples[i].live){
+                    playerScore+=10;  
+                    snakeMaxTail+=10;
+                    if(snakeSpeed<=6) snakeSpeed+=0.02;
+                }
+        			apples[i].live = false;       			
         		}
         	}
 
@@ -118,38 +132,60 @@
                snakeTail[i].color = ctx.fillStyle = "yellow";           
 	           ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
 }
-			   ctx.fill();     
+			   ctx.fill();    
 
-			while( snakeTail.length > snakeMaxTail )
+		 if( snakeTail.length > snakeMaxTail )
            {                  	   
                snakeTail.shift();
-           }
+           } 
 
-            var snakeHead = snakeTail[snakeTail.length-1];
+			
+
+            //var snakeHead = snakeTail[snakeTail.length-1];
           	for(var k = snakeTail.length-2; k>=0; k--){
-          			if(snakeHead.x==snakeTail[k].x && snakeHead.y == snakeTail[k].y){
-          				snakeMaxTail = snakeMaxTail - k;        				
+          		if(snakeX != snakeTail[0].x){
+          			if(snakeX==snakeTail[k].x && snakeY == snakeTail[k].y){
+                          //snakeMaxTail = 10;
+          				snakeMaxTail = snakeMaxTail - k; 
+          				if(snakeMaxTail<=10) snakeMaxTail =10; 
+          				alert('collision' + k +' '+ snakeMaxTail);         				  
+
           		        for(var c = 0; c<=k; c++){
           			         snakeTail[c].color = ctx.fillStyle = "red";
-          			         ctx.fill();         
+          			         ctx.fill();
+          			         playerScore-=1;  
+          		}
+
+
           		}	
           	}
           }
+              
+
+              
+
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
-             }
-     
+             }    
 }
 
-
+         function drawScore(){
+         	ctx.fillStyle = "black";
+         	ctx.font = "bold 30pt Arial";
+         	ctx.textBaseline = "bottom";
+         	ctx.fillText("Score: " + playerScore, 20, 50);
+         }
 
         function draw()
         {
+
           ctx.clearRect(0,0, canvas.width, canvas.height);
+          drawScore();
           appleSpawner();
           drawSnake();
           collisionApple();
+
 
 
             if(upPressed &&!downPressed && !leftPressed && !rightPressed  ){    
@@ -182,16 +218,19 @@
 
             if(snakeY < 0) {snakeY = canvas.height;}
 
-
+               
+               if(playerScore<=-10){ alert('Game Over\nYou Score is Over');window.location.reload();}
+               else{ requestAnimationFrame(draw);}
+  
         }
         
         function keyDownHandler(e){
             switch(e.key)
             {          	
-            	case "ArrowRight": rightPressed = true; canUp = true; canDown = true; canLeft = false; gameStarted= true; break;
+            	case "ArrowRight": rightPressed = true; canUp = true; canDown = true; canLeft = false; gameStarted= true;; break;
             	case "ArrowLeft": leftPressed = true;canUp = true; canDown = true; canRight= false; gameStarted= true;  break;
             	case "ArrowUp": upPressed = true;canLeft = true; canDown = false; canRight= true;gameStarted= true;  break;
-            	case "ArrowDown": downPressed = true;canLeft = true;canUp = false;  canRight= true;gameStarted= true;  break;      
+            	case "ArrowDown": downPressed = true;canLeft = true;canUp = false;  canRight= true;gameStarted= true; break;      
             }
         }
 
@@ -204,8 +243,10 @@
             	case "ArrowDown": downPressed = false; break;      
             }
         }
-           
-            setInterval(draw, 10); 		
+          // if(playerScore<=-1){ alert('Game Over\nYou Score is Over');window.location.reload();}
+           //else{
+           // setInterval(draw, 10); 	}
+            draw();	
 	</script>;;
 
 
