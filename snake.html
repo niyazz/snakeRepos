@@ -35,7 +35,7 @@
 		var sVelY = 0;
 		var snakeTail = [];
 
-		var snakeMaxTail = 100;
+		var snakeMaxTail = 10;
 		var safeZone =  2;
 		var gameStarted = false;
 
@@ -56,6 +56,7 @@
 		var  canLeft = true;
 
 		var playerScore = 0;
+		
 
           for(var  i = 0; i< appleAmount; i++){
             	apples[i] = {x:0, y:0, live: true};
@@ -127,43 +128,51 @@
 			
             if(gameStarted){
 
-			snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle});
+			
             for(var i=0; i<snakeTail.length;i++){         
-               snakeTail[i].color = ctx.fillStyle = "yellow";           
-	           ctx.rect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
+               snakeTail[i].color = ctx.fillStyle = "yellow";    
+                 if(snakeTail.length<=snakeMaxTail)       
+	           ctx.fillRect(snakeTail[i].x, snakeTail[i].y, snakeWidth, snakeHeight);
 }
-			   ctx.fill();    
+			      ctx.fill();
+                 if(snakeTail.length<=snakeMaxTail)
+			   snakeTail.push({x: snakeX, y: snakeY, color: ctx.fillStyle});
 
-		 if( snakeTail.length > snakeMaxTail )
-           {                  	   
-               snakeTail.shift();
-           } 
+		        while( snakeTail.length > snakeMaxTail )
+                     {                  	   
+                          snakeTail.shift();
+                     } 
 
 			
+          	for(var k = snakeTail.length-2; k>=0; k--){ 
 
-            //var snakeHead = snakeTail[snakeTail.length-1];
-          	for(var k = snakeTail.length-2; k>=0; k--){
-          		if(snakeX != snakeTail[0].x){
-          			if(snakeX==snakeTail[k].x && snakeY == snakeTail[k].y){
-                          //snakeMaxTail = 10;
+               	playerScore = Math.round(playerScore);   
+
+          		if(snakeX != snakeTail[0].x && k!=snakeTail.length-3 &&
+          		 k!=snakeTail.length-4 && k!=snakeTail.length-5 && k!=snakeTail.length-6
+          		  && k!=snakeTail.length-7 && k!=snakeTail.length-8  ){
+
+
+                                  
+          			if( ((snakeX>snakeTail[k].x && snakeX<snakeTail[k].x + snakeWidth/2)
+          			 || (snakeX<snakeTail[k].x && snakeX>snakeTail[k].x - snakeWidth/2))
+          			  && ((snakeY>snakeTail[k].y && snakeY<snakeTail[k].y + snakeHeight/2)
+          			   || (snakeY<snakeTail[k].y && snakeY>snakeTail[k].y - snakeHeight/2)) )   {
+                           
+          		                                                                      	
+                        snakeMaxTail = 10;
           				snakeMaxTail = snakeMaxTail - k; 
-          				if(snakeMaxTail<=10) snakeMaxTail =10; 
-          				alert('collision' + k +' '+ snakeMaxTail);         				  
+          				playerScore-=10; 
 
+          				if(snakeMaxTail<=10) snakeMaxTail =10; 
+          				
           		        for(var c = 0; c<=k; c++){
           			         snakeTail[c].color = ctx.fillStyle = "red";
-          			         ctx.fill();
-          			         playerScore-=1;  
+          			         ctx.fill();	          
           		}
-
-
           		}	
           	}
           }
-              
-
-              
-
 			ctx.closePath();	
 			snakeX+=sVelX;
 			snakeY+=sVelY;
@@ -219,7 +228,7 @@
             if(snakeY < 0) {snakeY = canvas.height;}
 
                
-               if(playerScore<=-10){ alert('Game Over\nYou Score is Over');window.location.reload();}
+               if(playerScore<=-10){ alert('Game Over\nYou Score is Over ' + playerScore);window.location.reload();}
                else{ requestAnimationFrame(draw);}
   
         }
